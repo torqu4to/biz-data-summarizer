@@ -1,0 +1,80 @@
+Relatório gerado em: 08/06/2025 18:23:37
+Arquivo fonte: 1581239272_movements_-2025-06-07-195120.xlsx
+
+=== RESUMO FINANCEIRO COMPLETO ===
+
+Período analisado: 5 dias
+Total de operações: 156
+Média de operações por dia: 31.2
+
+=== VALORES TOTAIS ===
+Total de Recebimentos: R$ 1140.56
+Total de Saídas: R$ 41.65
+Saldo Final: R$ 1098.91
+
+=== ANÁLISE DE TARIFAS ===
+Total de Tarifas: R$ 14.86
+Total de Tarifas Pareadas: R$ 14.86
+Média por Tarifa: R$ 0.22
+Percentual de Tarifas sobre Recebimentos: 1.30%
+==================================================
+
+=== ANÁLISE DE RECEBIMENTOS E TARIFAS PAREADOS ===
+
+Quantidade de Recebimentos Pareados: 68
+Quantidade de Tarifas Pareadas: 68
+Total de Recebimentos Pareados: R$ 759.60
+Total de Tarifas Pareadas: R$ 14.86
+Saldo (Recebimentos - Tarifas): R$ 744.74
+
+==================================================
+
+=== OPERAÇÕES NÃO PAREADAS ===
+
+
+Recebimentos sem Tarifa Correspondente:
+Data: 03/06/2025 - Movimento 556466208759 - Operação Relacionada: 113753937934 - Valor: R$ 17.00
+Data: 05/06/2025 - Movimento 558465485020 - Operação Relacionada: 114041583852 - Valor: R$ 363.96
+==================================================
+
+=== DETALHES POR TIPO DE OPERAÇÃO ===
+
+Rendimento bruto: R$ 22.43
+Imposto de renda: -R$ 5.04
+Recebimento: R$ 1140.56
+Tarifa do Mercado Pago: -R$ 14.86
+Transferência via Pix: -R$ 2415.43
+Adição de dinheiro: R$ 41.65
+Movimentação geral: R$ 5.15
+Pagamento com desconto recebido: -R$ 5.15
+Pagamento: -R$ 41.65
+==================================================
+
+=== TICKET MÉDIO POR DIA DA SEMANA ===
+
+Valor líquido por dia da semana (Recebimentos - Tarifas):
+
+Segunda-feira:
+  Recebimentos: R$ 83.40
+  Tarifas: R$ 1.77
+  Valor Líquido: R$ 81.63
+
+Terça-feira:
+  Recebimentos: R$ 116.00
+  Tarifas: R$ 1.85
+  Valor Líquido: R$ 114.15
+
+Quarta-feira:
+  Recebimentos: R$ 450.40
+  Tarifas: R$ 9.10
+  Valor Líquido: R$ 441.30
+
+Quinta-feira:
+  Recebimentos: R$ 65.00
+  Tarifas: R$ 1.39
+  Valor Líquido: R$ 63.61
+
+Sexta-feira:
+  Recebimentos: R$ 44.80
+  Tarifas: R$ 0.75
+  Valor Líquido: R$ 44.05
