@@ -1,0 +1,36 @@
+=== RESUMO FINANCEIRO ===
+
+Período analisado: 02/06/2025 a 06/06/2025
+Total de Entradas: R$ 1209.79
+Total de Despesas: R$ 2482.13
+Saldo Final: R$ -1272.34
+
+=== ANÁLISE DE RECEBIMENTOS E TARIFAS PAREADOS ===
+Quantidade de Recebimentos Pareados: 68
+Quantidade de Tarifas Pareadas: 68
+Total de Recebimentos Pareados: R$ 759.60
+Total de Tarifas Pareadas: R$ 14.86
+Saldo (Recebimentos - Tarifas): R$ 744.74
+
+
+=== OPERAÇÕES NÃO PAREADAS ===
+
+Recebimentos sem Tarifa Correspondente:
+Data: 03/06/2025 - Movimento 556466208759 - Operação Relacionada: 113753937934 - Valor: R$ 17.00
+Data: 05/06/2025 - Movimento 558465485020 - Operação Relacionada: 114041583852 - Valor: R$ 363.96
+
+=== ESTATÍSTICAS ADICIONAIS ===
+Número total de transações: 156
+Número de entradas: 78
+Número de saídas: 78
+
+=== DETALHES POR TIPO DE OPERAÇÃO ===
+Rendimento bruto: R$ 22.43
+Imposto de renda: R$ 5.04
+Recebimento: R$ 1140.56
+Tarifa do Mercado Pago: R$ 14.86
+Transferência via Pix: R$ 2415.43
+Adição de dinheiro: R$ 41.65
+Movimentação geral: R$ 5.15
+Pagamento com desconto recebido: R$ 5.15
+Pagamento: R$ 41.65
