@@ -2,6 +2,8 @@
 
 Este projeto é uma ferramenta automatizada para processamento e análise de relatórios financeiros. Ele foi desenvolvido com intuito de facilitar processos manuais, processando e gerando resumos de dados financeiros de forma eficiente.
 
+![Capa do Projeto](https://raw.githubusercontent.com/torqu4to/biz-data-summarizer/refs/heads/main/main-menu-demo.png)
+
 ## 🚀 Funcionalidades
 
 - Processamento automático de relatórios financeiros
