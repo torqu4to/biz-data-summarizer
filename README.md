@@ -1,46 +1,40 @@
-# Processador de Relatórios Financeiros
+# Resumo Relatório Financeiro
 
-Este script processa arquivos Excel contendo relatórios financeiros e gera um resumo detalhado das entradas e despesas.
+Este projeto é uma ferramenta automatizada para processamento e análise de relatórios financeiros. Ele foi desenvolvido com intuito de facilitar processos manuais, processando e gerando resumos de dados financeiros de forma eficiente.
 
-## Requisitos
+## 🚀 Funcionalidades
 
-- Python 3.7 ou superior
-- Bibliotecas Python listadas em `requirements.txt`
+- Processamento automático de relatórios financeiros
+- Extração de dados relevantes
+- Geração de resumos estruturados
 
-## Instalação
 
-1. Clone este repositório
+## 🏦 Bancos Suportados
+
+O script foi testado e validado com os seguintes bancos:
+
+- ✅ Mercado Pago (testado e validado)
+
+*Outros bancos podem ser adicionados conforme necessidade.*
+
+## 🔧 Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/resumo-relatorio-financeiro.git
+cd resumo-relatorio-financeiro
+```
+
 2. Instale as dependências:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Formato do Arquivo Excel
+## 💻 Como Usar
 
-O arquivo Excel deve conter as seguintes colunas:
-- Data: Data da transação
-- Descrição: Descrição da transação
-- Valor: Valor da transação (número)
-- Tipo: "Entrada" ou "Despesa"
-
-## Uso
-
-Execute o script:
+1. Coloque seus arquivos de relatório na pasta `files/`
+2. Execute o script principal:
 ```bash
-python processar_relatorio.py
+python script.py
 ```
-
-O script irá:
-1. Solicitar o caminho do arquivo Excel
-2. Processar os dados
-3. Gerar um arquivo de texto com o resumo financeiro
-
-## Saída
-
-O script gera um arquivo de texto contendo:
-- Período analisado
-- Total de entradas
-- Total de despesas
-- Saldo final
-- As 5 maiores despesas
-- As 5 maiores entradas 
+3. Os relatórios processados serão gerados na pasta `reports/`
