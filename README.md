@@ -40,3 +40,4 @@ pip install -r requirements.txt
 python script.py
 ```
 3. Os relatórios processados serão gerados na pasta `reports/`
+   
