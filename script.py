@@ -111,9 +111,10 @@ def exibir_menu():
     print(f"{Cores.VERDE}(3) Outras transações (não pareadas){Cores.RESET}")
     print(f"{Cores.VERDE}(4) Detalhes por tipo de operação{Cores.RESET}")
     print(f"{Cores.VERDE}(5) Ticket médio diário{Cores.RESET}")
+    print(f"{Cores.VERDE}(6) Análise de recebimentos e saídas{Cores.RESET}")
     print(f"{Cores.AMARELO}....................................{Cores.RESET}")
-    print(f"{Cores.VERDE}(6) Resumo financeiro{Cores.RESET}")
-    print(f"{Cores.VERDE}(7) Gerar relatório completo{Cores.RESET}")
+    print(f"{Cores.VERDE}(7) Resumo financeiro{Cores.RESET}")
+    print(f"{Cores.VERDE}(8) Gerar relatório completo{Cores.RESET}")
     print(f"{Cores.AMARELO}....................................{Cores.RESET}")
     print(f"{Cores.VERMELHO}(0) Sair{Cores.RESET}")
 
@@ -320,6 +321,69 @@ def gerar_ticket_medio_diario(df, f=None):
     else:
         print("\n".join(output))
 
+def gerar_analise_recebimentos_saidas(df, f=None):
+    """
+    Verifica recebimentos (já descontando tarifas) e procura por saídas no mesmo dia com o mesmo valor.
+    """
+    # Obtém recebimentos e tarifas
+    recebimentos = df[df['Tipo'] == 'Recebimento']
+    tarifas = df[df['Tipo'] == 'Tarifa do Mercado Pago']
+    
+    # Obtém saídas (transferências, pagamentos, etc)
+    saidas = df[df['Tipo'].isin(['Transferência via Pix', 'Pagamento', 'Saque'])]
+    
+    # Pareia recebimentos com tarifas
+    recebimentos_com_relacao = recebimentos[recebimentos['Operacao_Relacionada'].notna()]
+    tarifas_com_relacao = tarifas[tarifas['Operacao_Relacionada'].notna()]
+    
+    operacoes_completas = set(recebimentos_com_relacao['Operacao_Relacionada']) & set(tarifas_com_relacao['Operacao_Relacionada'])
+    
+    recebimentos_pareados = recebimentos_com_relacao[recebimentos_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
+    tarifas_pareadas = tarifas_com_relacao[tarifas_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
+    
+    # Cria um DataFrame com recebimentos líquidos (recebimento - tarifa)
+    recebimentos_liquidos = pd.DataFrame()
+    recebimentos_liquidos['Data'] = recebimentos_pareados['Data']
+    recebimentos_liquidos['Valor_Liquido'] = recebimentos_pareados['Valor'] - tarifas_pareadas['Valor'].abs()
+    recebimentos_liquidos['Descricao_Recebimento'] = recebimentos_pareados['Descrição']
+    recebimentos_liquidos['Operacao_Relacionada'] = recebimentos_pareados['Operacao_Relacionada']
+    
+    # Agrupa saídas por data
+    saidas_por_data = saidas.groupby('Data')
+    
+    output = ["=== ANÁLISE DE RECEBIMENTOS E SAÍDAS NO MESMO DIA ===\n"]
+    
+    # Para cada recebimento líquido, procura saídas no mesmo dia
+    for _, recebimento in recebimentos_liquidos.iterrows():
+        data = recebimento['Data']
+        valor_liquido = recebimento['Valor_Liquido']
+        
+        # Verifica se há saídas na mesma data
+        if data in saidas_por_data.groups:
+            saidas_do_dia = saidas_por_data.get_group(data)
+            
+            # Procura saídas com o mesmo valor
+            saidas_iguais = saidas_do_dia[abs(saidas_do_dia['Valor']) == valor_liquido]
+            
+            if not saidas_iguais.empty:
+                output.append(f"\nData: {data.strftime('%d/%m/%Y')}")
+                output.append(f"Recebimento:")
+                output.append(f"  Movimento: {recebimento['Descricao_Recebimento']}")
+                output.append(f"  Operação Relacionada: {recebimento['Operacao_Relacionada']}")
+                output.append(f"  Valor Líquido: R$ {valor_liquido:.2f}")
+                output.append(f"Saídas correspondentes:")
+                
+                for _, saida in saidas_iguais.iterrows():
+                    output.append(f"  Movimento: {saida['Descrição']}")
+                    output.append(f"  Tipo: {saida['Tipo']}")
+                    output.append(f"  Valor: R$ {abs(saida['Valor']):.2f}")
+                output.append("-" * 50)
+    
+    if f:
+        f.write("\n".join(output))
+    else:
+        print("\n".join(output))
+
 def processar_relatorio(caminho_arquivo=None):
     """
     Processa o relatório financeiro.
@@ -375,8 +439,10 @@ def processar_relatorio(caminho_arquivo=None):
             elif opcao == '5':
                 gerar_ticket_medio_diario(df)
             elif opcao == '6':
-                gerar_resumo_completo(df)
+                gerar_analise_recebimentos_saidas(df)
             elif opcao == '7':
+                gerar_resumo_completo(df)
+            elif opcao == '8':
                 # Gera nome do arquivo baseado na data atual
                 data_atual = datetime.now().strftime("%Y%m%d_%H%M%S")
                 nome_arquivo = f"relatorio_completo_{data_atual}.txt"
@@ -395,6 +461,8 @@ def processar_relatorio(caminho_arquivo=None):
                     gerar_detalhes_por_tipo(df, f)
                     f.write("\n" + "="*50 + "\n\n")
                     gerar_ticket_medio_diario(df, f)
+                    f.write("\n" + "="*50 + "\n\n")
+                    gerar_analise_recebimentos_saidas(df, f)
                 
                 print(f"\nRelatório completo salvo em: {caminho_completo}")
             else:
