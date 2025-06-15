@@ -108,13 +108,12 @@ def exibir_menu():
     print(f"{Cores.VERDE}(1) Escolher outro arquivo{Cores.RESET}")
     print(f"{Cores.AMARELO}....................................{Cores.RESET}")
     print(f"{Cores.VERDE}(2) Recebimentos e tarifas{Cores.RESET}")
-    print(f"{Cores.VERDE}(3) Outras transações (não pareadas){Cores.RESET}")
-    print(f"{Cores.VERDE}(4) Detalhes por tipo de operação{Cores.RESET}")
-    print(f"{Cores.VERDE}(5) Ticket médio diário{Cores.RESET}")
-    print(f"{Cores.VERDE}(6) Análise de recebimentos e saídas{Cores.RESET}")
+    print(f"{Cores.VERDE}(3) Detalhes por tipo de operação{Cores.RESET}")
+    print(f"{Cores.VERDE}(4) Ticket médio diário{Cores.RESET}")
+    print(f"{Cores.VERDE}(5) Análise de recebimentos e saídas{Cores.RESET}")
     print(f"{Cores.AMARELO}....................................{Cores.RESET}")
-    print(f"{Cores.VERDE}(7) Resumo financeiro{Cores.RESET}")
-    print(f"{Cores.VERDE}(8) Gerar relatório completo{Cores.RESET}")
+    print(f"{Cores.VERDE}(6) Resumo financeiro{Cores.RESET}")
+    print(f"{Cores.VERDE}(7) Gerar relatório completo{Cores.RESET}")
     print(f"{Cores.AMARELO}....................................{Cores.RESET}")
     print(f"{Cores.VERMELHO}(0) Sair{Cores.RESET}")
 
@@ -194,38 +193,6 @@ def gerar_analise_recebimentos_tarifas(df, f=None):
         f"Total de Tarifas Pareadas: R$ {total_tarifas_pareadas:.2f}",
         f"Saldo (Recebimentos - Tarifas): R$ {saldo_recebimentos_tarifas:.2f}\n"
     ]
-    
-    if f:
-        f.write("\n".join(output))
-    else:
-        print("\n".join(output))
-
-def gerar_operacoes_nao_pareadas(df, f=None):
-    """
-    Gera a lista de operações não pareadas.
-    """
-    recebimentos = df[df['Tipo'] == 'Recebimento']
-    tarifas = df[df['Tipo'] == 'Tarifa do Mercado Pago']
-    
-    recebimentos_com_relacao = recebimentos[recebimentos['Operacao_Relacionada'].notna()]
-    tarifas_com_relacao = tarifas[tarifas['Operacao_Relacionada'].notna()]
-    
-    operacoes_completas = set(recebimentos_com_relacao['Operacao_Relacionada']) & set(tarifas_com_relacao['Operacao_Relacionada'])
-    
-    recebimentos_nao_pareados = recebimentos_com_relacao[~recebimentos_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
-    tarifas_nao_pareadas = tarifas_com_relacao[~tarifas_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
-    
-    output = ["=== OPERAÇÕES NÃO PAREADAS ===\n"]
-    
-    if len(recebimentos_nao_pareados) > 0:
-        output.append("\nRecebimentos sem Tarifa Correspondente:")
-        for _, row in recebimentos_nao_pareados.iterrows():
-            output.append(f"Data: {row['Data'].strftime('%d/%m/%Y')} - Movimento {row['Descrição']} - Operação Relacionada: {row['Operacao_Relacionada']} - Valor: R$ {row['Valor']:.2f}")
-    
-    if len(tarifas_nao_pareadas) > 0:
-        output.append("\nTarifas sem Recebimento Correspondente:")
-        for _, row in tarifas_nao_pareadas.iterrows():
-            output.append(f"Data: {row['Data'].strftime('%d/%m/%Y')} - Movimento {row['Descrição']} - Operação Relacionada: {row['Operacao_Relacionada']} - Valor: R$ {abs(row['Valor']):.2f}")
     
     if f:
         f.write("\n".join(output))
@@ -465,16 +432,14 @@ def processar_relatorio(caminho_arquivo=None):
             elif opcao == '2':
                 gerar_analise_recebimentos_tarifas(df)
             elif opcao == '3':
-                gerar_operacoes_nao_pareadas(df)
-            elif opcao == '4':
                 gerar_detalhes_por_tipo(df)
-            elif opcao == '5':
+            elif opcao == '4':
                 gerar_ticket_medio_diario(df)
-            elif opcao == '6':
+            elif opcao == '5':
                 gerar_analise_recebimentos_saidas(df)
-            elif opcao == '7':
+            elif opcao == '6':
                 gerar_resumo_completo(df)
-            elif opcao == '8':
+            elif opcao == '7':
                 # Gera nome do arquivo baseado na data atual
                 data_atual = datetime.now().strftime("%Y%m%d_%H%M%S")
                 nome_arquivo = f"relatorio_completo_{data_atual}.txt"
@@ -487,8 +452,6 @@ def processar_relatorio(caminho_arquivo=None):
                     gerar_resumo_completo(df, f)
                     f.write("\n" + "="*50 + "\n\n")
                     gerar_analise_recebimentos_tarifas(df, f)
-                    f.write("\n" + "="*50 + "\n\n")
-                    gerar_operacoes_nao_pareadas(df, f)
                     f.write("\n" + "="*50 + "\n\n")
                     gerar_detalhes_por_tipo(df, f)
                     f.write("\n" + "="*50 + "\n\n")
