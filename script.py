@@ -324,52 +324,84 @@ def gerar_ticket_medio_diario(df, f=None):
 def gerar_analise_recebimentos_saidas(df, f=None):
     """
     Verifica recebimentos (já descontando tarifas) e procura por saídas no mesmo dia com o mesmo valor.
+    Considera uma margem de tolerância de R$ 0.01 para comparação dos valores.
     """
     # Obtém recebimentos e tarifas
-    recebimentos = df[df['Tipo'] == 'Recebimento']
-    tarifas = df[df['Tipo'] == 'Tarifa do Mercado Pago']
+    recebimentos = df[df['Tipo'] == 'Recebimento'].copy()
+    tarifas = df[df['Tipo'] == 'Tarifa do Mercado Pago'].copy()
     
     # Obtém saídas (transferências, pagamentos, etc)
-    saidas = df[df['Tipo'].isin(['Transferência via Pix', 'Pagamento', 'Saque'])]
+    saidas = df[df['Tipo'].isin(['Transferência via Pix', 'Pagamento', 'Saque'])].copy()
     
     # Pareia recebimentos com tarifas
     recebimentos_com_relacao = recebimentos[recebimentos['Operacao_Relacionada'].notna()]
     tarifas_com_relacao = tarifas[tarifas['Operacao_Relacionada'].notna()]
     
-    operacoes_completas = set(recebimentos_com_relacao['Operacao_Relacionada']) & set(tarifas_com_relacao['Operacao_Relacionada'])
+    # Cria um DataFrame com recebimentos líquidos
+    recebimentos_liquidos = []
     
-    recebimentos_pareados = recebimentos_com_relacao[recebimentos_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
-    tarifas_pareadas = tarifas_com_relacao[tarifas_com_relacao['Operacao_Relacionada'].isin(operacoes_completas)]
+    # Para cada recebimento, procura sua tarifa correspondente
+    for _, recebimento in recebimentos_com_relacao.iterrows():
+        tarifa_correspondente = tarifas_com_relacao[
+            tarifas_com_relacao['Operacao_Relacionada'] == recebimento['Operacao_Relacionada']
+        ]
+        
+        if not tarifa_correspondente.empty:
+            recebimentos_liquidos.append({
+                'Data': recebimento['Data'],
+                'Valor_Bruto': recebimento['Valor'],
+                'Valor_Tarifa': abs(tarifa_correspondente.iloc[0]['Valor']),
+                'Valor_Liquido': recebimento['Valor'] - abs(tarifa_correspondente.iloc[0]['Valor']),
+                'Descricao_Recebimento': recebimento['Descrição'],
+                'Operacao_Relacionada': recebimento['Operacao_Relacionada']
+            })
     
-    # Cria um DataFrame com recebimentos líquidos (recebimento - tarifa)
-    recebimentos_liquidos = pd.DataFrame()
-    recebimentos_liquidos['Data'] = recebimentos_pareados['Data']
-    recebimentos_liquidos['Valor_Liquido'] = recebimentos_pareados['Valor'] - tarifas_pareadas['Valor'].abs()
-    recebimentos_liquidos['Descricao_Recebimento'] = recebimentos_pareados['Descrição']
-    recebimentos_liquidos['Operacao_Relacionada'] = recebimentos_pareados['Operacao_Relacionada']
+    # Converte a lista para DataFrame
+    recebimentos_liquidos = pd.DataFrame(recebimentos_liquidos)
     
-    # Agrupa saídas por data
-    saidas_por_data = saidas.groupby('Data')
+    # Converte valores para float com 2 casas decimais
+    if not recebimentos_liquidos.empty:
+        recebimentos_liquidos['Valor_Liquido'] = recebimentos_liquidos['Valor_Liquido'].round(2)
+    saidas['Valor'] = saidas['Valor'].round(2)
     
     output = ["=== ANÁLISE DE RECEBIMENTOS E SAÍDAS NO MESMO DIA ===\n"]
+    
+    # Debug: Mostrar todos os recebimentos líquidos
+    output.append("\nDEBUG - Recebimentos Líquidos:")
+    for _, rec in recebimentos_liquidos.iterrows():
+        output.append(f"Data: {rec['Data'].strftime('%d/%m/%Y %H:%M:%S')} - Valor Bruto: R$ {rec['Valor_Bruto']:.2f} - Tarifa: R$ {rec['Valor_Tarifa']:.2f} - Valor Líquido: R$ {rec['Valor_Liquido']:.2f}")
+    
+    # Debug: Mostrar todas as saídas
+    output.append("\nDEBUG - Saídas:")
+    for _, saida in saidas.iterrows():
+        output.append(f"Data: {saida['Data'].strftime('%d/%m/%Y %H:%M:%S')} - Valor: R$ {abs(saida['Valor']):.2f}")
+    
+    output.append("\n=== CORRESPONDÊNCIAS ENCONTRADAS ===")
     
     # Para cada recebimento líquido, procura saídas no mesmo dia
     for _, recebimento in recebimentos_liquidos.iterrows():
         data = recebimento['Data']
         valor_liquido = recebimento['Valor_Liquido']
         
-        # Verifica se há saídas na mesma data
-        if data in saidas_por_data.groups:
-            saidas_do_dia = saidas_por_data.get_group(data)
+        # Filtra saídas do mesmo dia
+        saidas_do_dia = saidas[saidas['Data'].dt.date == data.date()]
+        
+        if not saidas_do_dia.empty:
+            # Procura saídas com valor próximo (considerando margem de tolerância)
+            margem_tolerancia = 0.01  # R$ 0.01 de tolerância
             
-            # Procura saídas com o mesmo valor
-            saidas_iguais = saidas_do_dia[abs(saidas_do_dia['Valor']) == valor_liquido]
+            # Comparação com arredondamento para 2 casas decimais
+            saidas_iguais = saidas_do_dia[
+                abs(abs(saidas_do_dia['Valor']) - valor_liquido) <= margem_tolerancia
+            ]
             
             if not saidas_iguais.empty:
                 output.append(f"\nData: {data.strftime('%d/%m/%Y')}")
                 output.append(f"Recebimento:")
                 output.append(f"  Movimento: {recebimento['Descricao_Recebimento']}")
                 output.append(f"  Operação Relacionada: {recebimento['Operacao_Relacionada']}")
+                output.append(f"  Valor Bruto: R$ {recebimento['Valor_Bruto']:.2f}")
+                output.append(f"  Tarifa: R$ {recebimento['Valor_Tarifa']:.2f}")
                 output.append(f"  Valor Líquido: R$ {valor_liquido:.2f}")
                 output.append(f"Saídas correspondentes:")
                 
